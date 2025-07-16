@@ -1,0 +1,155 @@
+.invoice-print-container {
+  background: white;
+  padding: 40px;
+  margin: 20px auto;
+  max-width: 900px;
+  border: 1px solid #ccc;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invoice-header h2 {
+  margin: 0;
+}
+
+.invoice-badge {
+  background: orange;
+  color: white;
+  padding: 5px 12px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.invoice-title {
+  text-align: center;
+  margin: 20px 0;
+  /* margin-bottom: 60px; */
+}
+
+.invoice-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.invoice-meta div {
+  width: 45%;
+}
+
+.invoice-items {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.invoice-items th,
+.invoice-items td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.invoice-items th {
+  background-color: #6b5b95;
+  color: white;
+}
+
+.invoice-summary {
+  display: flex;
+  justify-content: space-between;
+}
+
+.invoice-summary .in-words {
+  width: 50%;
+  background: #f8f8f8;
+  padding: 10px;
+}
+
+.invoice-summary .totals {
+  width: 45%;
+}
+
+.invoice-summary .totals p {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+
+.invoice-summary .total-line {
+  background: #c9c9ff;
+  font-weight: bold;
+  padding: 6px;
+}
+
+.invoice-buttons {
+  margin-top: 20px;
+}
+
+.invoice-buttons button {
+  margin-right: 10px;
+  padding: 8px 16px;
+}
+
+
+.invoice-form-container {
+  max-width: 1500px;
+  margin: 20px auto;
+  background-color: #eaf2f8;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.invoice-form-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.invoice-form-group input {
+  flex: 1;
+  min-width: 250px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.invoice-form-group input[type="date"] {
+  color: #555;
+}
+
+.invoice-form-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.invoice-form-button button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.invoice-form-button button:hover {
+  background-color: #0056b3;
+}
+
