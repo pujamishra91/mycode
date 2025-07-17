@@ -250,6 +250,18 @@ function App() {
     const updated = [...items];
     updated[index][field] = value;
     setItems(updated);
+    if(field=="product")
+    {
+    setProduct(updated);
+    }
+    if(field=="quantity")
+    {
+    setQuantity(updated);
+    }
+    if(field=="unitPrice")
+    {
+    setUnitPrice(updated);
+    }
   };
 
   const addItem = () => {
@@ -531,6 +543,7 @@ function App() {
                     placeholder="Product Name"
                     value={item.product}
                     onChange={(e) => handleItemChange(index, 'product', e.target.value)}
+                   // onChange={(e) => handleItemChange(index, 'product', e.target.value)}
                   />
                   <input
                     type="number"
