@@ -51,7 +51,7 @@ function App() {
 
   useEffect(() => {
     // Fetch invoices
-    fetch('http://localhost:5000/api/invoices')
+    fetch('https://mybackend-gm4k.onrender.com/api/invoices')
       .then(res => res.json())
       .then(data => {
         const formatted = data.map(inv => ({
@@ -73,7 +73,7 @@ function App() {
       .catch(err => console.error('Error loading invoices:', err));
 
     // Fetch payment details
-    fetch('http://localhost:5000/api/payments')
+    fetch('https://mybackend-gm4k.onrender.com/api/payments')
       .then(res => res.json())
       .then(data => setPayments(data))
       .catch(err => console.error('Error loading payment details:', err));
@@ -126,7 +126,7 @@ function App() {
       paymentAmount
     };
     try {
-      const res = await fetch('http://localhost:5000/api/invoices', {
+      const res = await fetch('https://mybackend-gm4k.onrender.com/api/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newInvoice)
