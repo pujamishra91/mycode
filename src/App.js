@@ -73,7 +73,7 @@ function App() {
       .catch(err => console.error('Error loading invoices:', err));
 
     // Fetch payment details
-    fetch('https://mybackend-gm4k.onrender.com/api/payments')
+    fetch('https://mybackend-gm4k.onrender.com/api/invoices')
       .then(res => res.json())
       .then(data => setPayments(data))
       .catch(err => console.error('Error loading payment details:', err));
