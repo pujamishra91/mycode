@@ -5,7 +5,7 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import './InvoicePrint.css'; // create this new CSS file
 //import jsPDF from 'jspdf';
-
+import { HashRouter as Router } from "react-router-dom";
 const formatDateMMDDYYYY = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
