@@ -28,7 +28,7 @@ yarn-error.log*
 Thumbs.db
 
 # Backend (prevent from pushing backend and its node_modules)
-/backend
+# /backend
 /backend/node_modules
 
 # Optional: Ignore IDE/editor configs
