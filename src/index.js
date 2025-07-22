@@ -1,22 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter, Routes, Route } from 'react-router-dom'; // For routing
-import './index.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App';
-import InvoicePrintPage from './InvoicePrintPage'; // Your print page component
-import reportWebVitals from './reportWebVitals';
+import Login from './Pages/Login';
+import Signup from './Pages/Signup';
+import ProtectedRoute from './ProtectedRoute';
+import InvoicePrintPage from './InvoicePrintPage'; // ✅ Import this new page
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/print" element={<InvoicePrintPage />} />
-        <Route path="*" element={<div>404 - Page Not Found</div>} /> {/* Optional fallback */}
-      </Routes>
-    </HashRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <App />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/print" element={<InvoicePrintPage />} /> {/* ✅ Add this route */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  </BrowserRouter>
 );
-
-reportWebVitals();

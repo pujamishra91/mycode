@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
+import '../App.css';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import './InvoicePrint.css'; // create this new CSS file
+import '../InvoicePrint.css'; // create this new CSS file
 //import jsPDF from 'jspdf';
 import { HashRouter as Router } from "react-router-dom";
-import StatusChart from './StatusChart';
-//import RecentUnpaidCustomers from './components/RecentUnpaidCustomers';
-
 const formatDateMMDDYYYY = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -17,19 +14,6 @@ const formatDateMMDDYYYY = (dateString) => {
   const yyyy = date.getFullYear();
   return `${mm}/${dd}/${yyyy}`;
 };
-// const getRecentPayments = () => {
-//   return invoices
-//     .filter(inv => inv.status.toLowerCase() === 'paid')
-//     .sort((a, b) => new Date(b.paymentDate || b.date) - new Date(a.paymentDate || a.date))
-//     .slice(0, 5);
-// };
-
-// const getUnpaidInvoices = () => {
-//   return invoices
-//     .filter(inv => inv.status.toLowerCase() === 'unpaid')
-//     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-//     .slice(0, 5);
-// };
 
 
 function App() {
@@ -67,72 +51,42 @@ function App() {
 
   useEffect(() => {
     // Fetch invoices
-    fetch('https://mybackend-gm4k.onrender.com/api/invoices')
+    fetch('http://localhost:5000/api/invoices')
       .then(res => res.json())
       .then(data => {
-        const today = new Date();
-        const formatted = data.map(inv => {
-          const invoiceDate = new Date(inv.date);
-          const dueDate = new Date(invoiceDate);
-          dueDate.setDate(dueDate.getDate() + 30);
-
-          let status = 'Unpaid';
-          if (inv.payment_amount >= inv.total) {
-            status = 'Paid';
-          } else if (new Date(today) > dueDate) {
-            status = 'Overdue';
-          }
-
-          return {
-            id: inv.id,
-            invoiceNumber: inv.invoice_number,
-            client: inv.client,
-            product: inv.product,
-            quantity: inv.quantity,
-            unitPrice: inv.unit_price,
-            amount: inv.amount,
-            gst: inv.gst,
-            total: inv.total,
-            date: inv.date,
-            description: inv.description,
-            paymentAmount: inv.payment_amount || 0,
-            status
-          };
-        });
+        const formatted = data.map(inv => ({
+          id: inv.id,
+          invoiceNumber: inv.invoice_number,
+          client: inv.client,
+          product: inv.product,
+          quantity: inv.quantity,
+          unitPrice: inv.unit_price,
+          amount: inv.amount,
+          gst: inv.gst,
+          total: inv.total,
+          date: inv.date,
+          description: inv.description
+        }));
         setInvoices(formatted);
         setInvoiceCount(data.length + 1);
       })
       .catch(err => console.error('Error loading invoices:', err));
 
     // Fetch payment details
-    fetch('https://mybackend-gm4k.onrender.com/api/invoices')
+    fetch('http://localhost:5000/api/invoices')
       .then(res => res.json())
       .then(data => setPayments(data))
       .catch(err => console.error('Error loading payment details:', err));
   }, []);
 
   const handlePrintClick = (invoice) => {
-    // Ensure it's saved before opening the new tab
-    localStorage.setItem('selectedInvoice', JSON.stringify(invoice));
+  // Ensure it's saved before opening the new tab
+  localStorage.setItem('selectedInvoice', JSON.stringify(invoice));
 
-    // Delay slightly to give localStorage time to sync before new tab reads it
-    setTimeout(() => {
-      window.open('/print', '_blank');
-    }, 100); // small delay
-  };
-
-  const getRecentPayments = () => {
-  return invoices
-    .filter(inv => inv.status.toLowerCase() === 'paid')
-    .sort((a, b) => new Date(b.paymentDate || b.date) - new Date(a.paymentDate || a.date))
-    .slice(0, 5);
-};
-
-const getUnpaidInvoices = () => {
-  return invoices
-    .filter(inv => inv.status.toLowerCase() === 'unpaid')
-    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-    .slice(0, 5);
+  // Delay slightly to give localStorage time to sync before new tab reads it
+  setTimeout(() => {
+    window.open('/print', '_blank');
+  }, 100); // small delay
 };
 
 
@@ -172,7 +126,7 @@ const getUnpaidInvoices = () => {
       paymentAmount
     };
     try {
-      const res = await fetch('https://mybackend-gm4k.onrender.com/api/invoices', {
+      const res = await fetch('http://localhost:5000/api/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newInvoice)
@@ -296,14 +250,17 @@ const getUnpaidInvoices = () => {
     const updated = [...items];
     updated[index][field] = value;
     setItems(updated);
-    if (field == "product") {
-      setProduct(updated);
+    if(field=="product")
+    {
+    setProduct(updated);
     }
-    if (field == "quantity") {
-      setQuantity(updated);
+    if(field=="quantity")
+    {
+    setQuantity(updated);
     }
-    if (field == "unitPrice") {
-      setUnitPrice(updated);
+    if(field=="unitPrice")
+    {
+    setUnitPrice(updated);
     }
   };
 
@@ -317,10 +274,7 @@ const getUnpaidInvoices = () => {
     setItems(updated);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    window.location.href = '/login';
-  };
+
   const renderPrintForm = () => {
     if (!selectedInvoice) return null;
     return (
@@ -383,7 +337,6 @@ const getUnpaidInvoices = () => {
             <p>Invoice No: <a href="#">{invoice.invoiceNumber}</a></p>
             <p>Date: {formatDateMMDDYYYY(invoice.date)}</p>
           </div>
-
         </div>
 
         <table className="invoice-items">
@@ -480,13 +433,6 @@ const getUnpaidInvoices = () => {
         <div className="sidebar">
           <h2>Invoice Manager</h2>
           <button
-            className={activeTab === 'dashboard' ? 'active' : ''}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            📊 Dashboard
-          </button>
-
-          <button
             className={activeTab === 'add' ? 'active' : ''}
             onClick={() => setActiveTab('add')}
           >
@@ -498,82 +444,10 @@ const getUnpaidInvoices = () => {
           >
             📄 Invoice Details
           </button>
-
-          <button
-
-            onClick={() => handleLogout()}
-          >
-            Logout
-          </button>
-
         </div>
 
         {/* Main Content */}
-        <div className="main-content" style={{ width: '100%' }}>
-          {activeTab === 'dashboard' && (
-            <div style={{ padding: '20px', width: '100%' }}>
-              <h2>📊 Dashboard</h2>
-              <div className="dashboard-stats">
-                <p>Total Invoices: {invoices.length}</p>
-                <p>Paid: {invoices.filter(inv => inv.status === 'Paid').length}</p>
-                <p>Unpaid: {invoices.filter(inv => inv.status === 'Unpaid').length}</p>
-                <p>Overdue: {invoices.filter(inv => inv.status === 'Overdue').length}</p>
-                {/* Status Pie/Bar Chart */}
-
-
-              </div>
-              <div>
-                <StatusChart invoices={invoices} />
-              </div>
-              <div>
-                <h3 style={{ marginTop: '40px' }}>🕑 Recent Payments</h3>
-                <table className="invoice-table" style={{ maxWidth: '800px' }}>
-                  <thead>
-                    <tr>
-                      <th>Invoice No</th>
-                      <th>Client</th>
-                      <th>Paid On</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getRecentPayments().map(inv => (
-                      <tr key={inv.id}>
-                        <td>{inv.invoiceNumber}</td>
-                        <td>{inv.client}</td>
-                        <td>{formatDateMMDDYYYY(inv.paymentDate)}</td>
-                        <td>{formatRupees(inv.paymentAmount)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                <h3 style={{ marginTop: '40px' }}>📌 Unpaid Invoices</h3>
-                <table className="invoice-table" style={{ maxWidth: '800px' }}>
-                  <thead>
-                    <tr>
-                      <th>Invoice No</th>
-                      <th>Client</th>
-                      <th>Total</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getUnpaidInvoices().map(inv => (
-                      <tr key={inv.id}>
-                        <td>{inv.invoiceNumber}</td>
-                        <td>{inv.client}</td>
-                        <td>{formatRupees(inv.total)}</td>
-                        <td>{formatDateMMDDYYYY(inv.date)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-              </div>
-            </div>
-          )}
-
+        <div className="main-content">
           {activeTab === 'add' && (
             <div>
               {/* <h3>Add New Invoice</h3> */}
@@ -669,7 +543,7 @@ const getUnpaidInvoices = () => {
                     placeholder="Product Name"
                     value={item.product}
                     onChange={(e) => handleItemChange(index, 'product', e.target.value)}
-                  // onChange={(e) => handleItemChange(index, 'product', e.target.value)}
+                   // onChange={(e) => handleItemChange(index, 'product', e.target.value)}
                   />
                   <input
                     type="number"
@@ -777,7 +651,6 @@ const getUnpaidInvoices = () => {
                 <th>Total</th>
                 <th>Date</th>
                 <th>Description</th>
-                <th>Status</th>
 
               </tr>
             </thead>
@@ -798,15 +671,6 @@ const getUnpaidInvoices = () => {
                   <td>{formatRupees(invoice.total)}</td>
                   <td>{formatDateMMDDYYYY(invoice.date)}</td>
                   <td>{invoice.description}</td>
-                  <td style={{
-                    fontWeight: 'bold', color:
-                      invoice.status === 'Paid' ? 'green' :
-                        invoice.status === 'Overdue' ? 'red' :
-                          '#f39c12'
-                  }}>
-                    {invoice.status}
-                  </td>
-
                 </tr>
               ))}
             </tbody>

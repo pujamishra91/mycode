@@ -22,7 +22,7 @@ const InvoicePrintPage = () => {
   const formatRupees = (num) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(num);
 
-  if (!invoice || !Array.isArray(invoice.items)) {
+  if (!invoice) {
     return <div>No invoice data available</div>;
   }
 
