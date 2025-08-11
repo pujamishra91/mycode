@@ -63,107 +63,53 @@ function App() {
 
 
 
-useEffect(() => {
-  // Power Automate HTTP endpoint
-  const apiUrl = "https://prod-05.centralindia.logic.azure.com/workflows/b9f48498ff164c409c13dea42701e691/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=R6h95qYgyuiAaysDzbcMTSktbUWkHQ6DOESjK6BzpR4";
-
-  // Fetch invoices
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
-      const today = new Date();
-
-      const formatted = data.map(inv => {
-        const invoiceDate = new Date(inv.date);
-        const dueDate = new Date(invoiceDate);
-        dueDate.setDate(dueDate.getDate() + 30);
-
-        let status = "Unpaid";
-        // No payment_amount field in response → default to 0
-        const paymentAmount = inv.payment_amount || 0;
-
-        if (paymentAmount >= inv.total) {
-          status = "Paid";
-        } else if (today > dueDate) {
-          status = "Overdue";
-        }
-
-        return {
-          id: inv.id,
-          invoiceNumber: inv.invoice_number,
-          client: inv.client,
-          product: inv.product,
-          quantity: inv.quantity,
-          unitPrice: inv.unit_price,
-          amount: inv.amount,
-          gst: inv.gst,
-          total: inv.total,
-          date: inv.date,
-          description: inv.description,
-          paymentAmount,
-          status
-        };
-      });
-
-      setInvoices(formatted);
-      setInvoiceCount(data.length + 1);
-    })
-    .catch(err => console.error("Error loading invoices:", err));
-
-  // Fetch payment details (if separate, otherwise can reuse above)
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => setPayments(data))
-    .catch(err => console.error("Error loading payment details:", err));
-
-}, []);
 
 
-  // useEffect(() => {
-  //   // Fetch invoices
-  //   fetch('http://localhost:5000/api/invoices')
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       const today = new Date();
-  //       const formatted = data.map(inv => {
-  //         const invoiceDate = new Date(inv.date);
-  //         const dueDate = new Date(invoiceDate);
-  //         dueDate.setDate(dueDate.getDate() + 30);
+  useEffect(() => {
+    // Fetch invoices
+    fetch('http://localhost:5000/api/invoices')
+      .then(res => res.json())
+      .then(data => {
+        const today = new Date();
+        const formatted = data.map(inv => {
+          const invoiceDate = new Date(inv.date);
+          const dueDate = new Date(invoiceDate);
+          dueDate.setDate(dueDate.getDate() + 30);
 
-  //         let status = 'Unpaid';
-  //         if (inv.payment_amount >= inv.total) {
-  //           status = 'Paid';
-  //         } else if (new Date(today) > dueDate) {
-  //           status = 'Overdue';
-  //         }
+          let status = 'Unpaid';
+          if (inv.payment_amount >= inv.total) {
+            status = 'Paid';
+          } else if (new Date(today) > dueDate) {
+            status = 'Overdue';
+          }
 
-  //         return {
-  //           id: inv.id,
-  //           invoiceNumber: inv.invoice_number,
-  //           client: inv.client,
-  //           product: inv.product,
-  //           quantity: inv.quantity,
-  //           unitPrice: inv.unit_price,
-  //           amount: inv.amount,
-  //           gst: inv.gst,
-  //           total: inv.total,
-  //           date: inv.date,
-  //           description: inv.description,
-  //           paymentAmount: inv.payment_amount || 0,
-  //           status
-  //         };
-  //       });
-  //       setInvoices(formatted);
-  //       setInvoiceCount(data.length + 1);
-  //     })
-  //     .catch(err => console.error('Error loading invoices:', err));
+          return {
+            id: inv.id,
+            invoiceNumber: inv.invoice_number,
+            client: inv.client,
+            product: inv.product,
+            quantity: inv.quantity,
+            unitPrice: inv.unit_price,
+            amount: inv.amount,
+            gst: inv.gst,
+            total: inv.total,
+            date: inv.date,
+            description: inv.description,
+            paymentAmount: inv.payment_amount || 0,
+            status
+          };
+        });
+        setInvoices(formatted);
+        setInvoiceCount(data.length + 1);
+      })
+      .catch(err => console.error('Error loading invoices:', err));
 
-  //   // Fetch payment details
-  //   fetch('http://localhost:5000/api/invoices')
-  //     .then(res => res.json())
-  //     .then(data => setPayments(data))
-  //     .catch(err => console.error('Error loading payment details:', err));
-  // }, []);
+    // Fetch payment details
+    fetch('http://localhost:5000/api/invoices')
+      .then(res => res.json())
+      .then(data => setPayments(data))
+      .catch(err => console.error('Error loading payment details:', err));
+  }, []);
 
   const handlePrintClick = (invoice) => {
     // Ensure it's saved before opening the new tab
