@@ -63,53 +63,107 @@ function App() {
 
 
 
+useEffect(() => {
+  // Power Automate HTTP endpoint
+  const apiUrl = "https://prod-05.centralindia.logic.azure.com/workflows/b9f48498ff164c409c13dea42701e691/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=R6h95qYgyuiAaysDzbcMTSktbUWkHQ6DOESjK6BzpR4";
+
+  // Fetch invoices
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
+      const today = new Date();
+
+      const formatted = data.map(inv => {
+        const invoiceDate = new Date(inv.date);
+        const dueDate = new Date(invoiceDate);
+        dueDate.setDate(dueDate.getDate() + 30);
+
+        let status = "Unpaid";
+        // No payment_amount field in response → default to 0
+        const paymentAmount = inv.payment_amount || 0;
+
+        if (paymentAmount >= inv.total) {
+          status = "Paid";
+        } else if (today > dueDate) {
+          status = "Overdue";
+        }
+
+        return {
+          id: inv.id,
+          invoiceNumber: inv.invoice_number,
+          client: inv.client,
+          product: inv.product,
+          quantity: inv.quantity,
+          unitPrice: inv.unit_price,
+          amount: inv.amount,
+          gst: inv.gst,
+          total: inv.total,
+          date: inv.date,
+          description: inv.description,
+          paymentAmount,
+          status
+        };
+      });
+
+      setInvoices(formatted);
+      setInvoiceCount(data.length + 1);
+    })
+    .catch(err => console.error("Error loading invoices:", err));
+
+  // Fetch payment details (if separate, otherwise can reuse above)
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => setPayments(data))
+    .catch(err => console.error("Error loading payment details:", err));
+
+}, []);
 
 
-  useEffect(() => {
-    // Fetch invoices
-    fetch('https://mybackend-gm4k.onrender.com/api/invoices')
-      .then(res => res.json())
-      .then(data => {
-        const today = new Date();
-        const formatted = data.map(inv => {
-          const invoiceDate = new Date(inv.date);
-          const dueDate = new Date(invoiceDate);
-          dueDate.setDate(dueDate.getDate() + 30);
+  // useEffect(() => {
+  //   // Fetch invoices
+  //   fetch('http://localhost:5000/api/invoices')
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       const today = new Date();
+  //       const formatted = data.map(inv => {
+  //         const invoiceDate = new Date(inv.date);
+  //         const dueDate = new Date(invoiceDate);
+  //         dueDate.setDate(dueDate.getDate() + 30);
 
-          let status = 'Unpaid';
-          if (inv.payment_amount >= inv.total) {
-            status = 'Paid';
-          } else if (new Date(today) > dueDate) {
-            status = 'Overdue';
-          }
+  //         let status = 'Unpaid';
+  //         if (inv.payment_amount >= inv.total) {
+  //           status = 'Paid';
+  //         } else if (new Date(today) > dueDate) {
+  //           status = 'Overdue';
+  //         }
 
-          return {
-            id: inv.id,
-            invoiceNumber: inv.invoice_number,
-            client: inv.client,
-            product: inv.product,
-            quantity: inv.quantity,
-            unitPrice: inv.unit_price,
-            amount: inv.amount,
-            gst: inv.gst,
-            total: inv.total,
-            date: inv.date,
-            description: inv.description,
-            paymentAmount: inv.payment_amount || 0,
-            status
-          };
-        });
-        setInvoices(formatted);
-        setInvoiceCount(data.length + 1);
-      })
-      .catch(err => console.error('Error loading invoices:', err));
+  //         return {
+  //           id: inv.id,
+  //           invoiceNumber: inv.invoice_number,
+  //           client: inv.client,
+  //           product: inv.product,
+  //           quantity: inv.quantity,
+  //           unitPrice: inv.unit_price,
+  //           amount: inv.amount,
+  //           gst: inv.gst,
+  //           total: inv.total,
+  //           date: inv.date,
+  //           description: inv.description,
+  //           paymentAmount: inv.payment_amount || 0,
+  //           status
+  //         };
+  //       });
+  //       setInvoices(formatted);
+  //       setInvoiceCount(data.length + 1);
+  //     })
+  //     .catch(err => console.error('Error loading invoices:', err));
 
-    // Fetch payment details
-    fetch('https://mybackend-gm4k.onrender.com/api/invoices')
-      .then(res => res.json())
-      .then(data => setPayments(data))
-      .catch(err => console.error('Error loading payment details:', err));
-  }, []);
+  //   // Fetch payment details
+  //   fetch('http://localhost:5000/api/invoices')
+  //     .then(res => res.json())
+  //     .then(data => setPayments(data))
+  //     .catch(err => console.error('Error loading payment details:', err));
+  // }, []);
 
   const handlePrintClick = (invoice) => {
     // Ensure it's saved before opening the new tab
@@ -138,67 +192,110 @@ const getUnpaidInvoices = () => {
 
 
   const handleAddInvoice = async (e) => {
-    e.preventDefault();
-    if (!client || !product || !quantity || !unitPrice || !date) return;
+  e.preventDefault();
+  if (!client || !product || !quantity || !unitPrice || !date) return;
 
-    const itemDetails = items.map((item) => {
-      const qty = parseInt(item.quantity);
-      const price = parseFloat(item.unitPrice);
-      const amount = qty * price;
-      return { ...item, amount };
+  const itemDetails = items.map((item) => {
+    const qty = parseInt(item.quantity);
+    const price = parseFloat(item.unitPrice);
+    const amount = qty * price;
+    return { ...item, amount };
+  });
+  const paymentDetails = items.map((item) => {
+    const paymentMode = item.paymentMode;
+    const paymentDate = item.paymentDate;
+    const amount = item.paymentAmount;
+    return { ...item, amount };
+  });
+  const subTotal = itemDetails.reduce((sum, item) => sum + item.amount, 0);
+  const gstAmount = subTotal * GST_RATE;
+  const totalWithGST = subTotal + gstAmount;
+
+  const invoiceNumber = `INV-${invoiceCount.toString().padStart(4, '0')}`;
+
+  const newInvoice = {
+    invoiceNumber,
+    client,
+    items: itemDetails, // include this only if needed by backend
+    amount: subTotal,
+    gst: gstAmount,
+    total: totalWithGST,
+    date,
+    number,
+    address,
+    pin,
+    state,
+    email,
+    paymentMode,
+    paymentDate,
+    paymentAmount
+  };
+
+  try {
+    const res = await fetch('http://localhost:5000/api/invoices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newInvoice)
     });
 
-    const subTotal = itemDetails.reduce((sum, item) => sum + item.amount, 0);
-    const gstAmount = subTotal * GST_RATE;
-    const totalWithGST = subTotal + gstAmount;
+    if (res.ok) {
+      const data = await res.json(); // contains { id: invoiceId }
+      const invoiceId = data.id;
 
-    const invoiceNumber = `INV-${invoiceCount.toString().padStart(4, '0')}`;
-
-    const newInvoice = {
-      invoiceNumber,
-      client,
-      items: itemDetails,
-      amount: subTotal,
-      gst: gstAmount,
-      total: totalWithGST,
-      date,
-      number,
-      address,
-      pin,
-      state,
-      email,
-      paymentMode,
-      paymentDate,
-      paymentAmount
-    };
-    try {
-      const res = await fetch('https://mybackend-gm4k.onrender.com/api/invoices', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newInvoice)
-      });
-
-      if (res.ok) {
-        setInvoices([...invoices, { id: Date.now(), ...newInvoice }]);
-        setInvoiceCount(invoiceCount + 1);
-        setClient('');
-        setProduct('');
-        setQuantity('');
-        setUnitPrice('');
-        setDate('');
-        setDescription('');
-        setNumber('');
-        setAddress('');
-        setPin('');
-        setState('');
-        setEmail('');
-      } else {
-        console.error('Failed to add invoice');
+      // Store each item in ProductDetails table
+      for (const item of itemDetails) {
+        await fetch('http://localhost:5000/api/ProductDetails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            invoiceId,
+            product: item.product,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+           // amount: item.amount,
+            description: item.description || ''
+          })
+        });
       }
-    } catch (err) {
-      console.error('Error posting invoice:', err);
+
+        // Store each item in Payments table
+      for (const item of paymentDetails) {
+        await fetch('http://localhost:5000/api/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            
+            paymentMode: item.paymentMode,
+            paymentDate: item.paymentDate,
+            amount: item.paymentAmount,
+            invoiceId,
+          })
+        });
+      }
+
+      // Update UI state
+      setInvoices([...invoices, { id: invoiceId, ...newInvoice }]);
+      setInvoiceCount(invoiceCount + 1);
+
+      // Reset fields
+      setClient('');
+      setProduct('');
+      setQuantity('');
+      setUnitPrice('');
+      setDate('');
+      setDescription('');
+      setNumber('');
+      setAddress('');
+      setPin('');
+      setState('');
+      setEmail('');
+    } else {
+      console.error('Failed to add invoice');
     }
-  };
+  } catch (err) {
+    console.error('Error posting invoice:', err);
+  }
+};
 
   const formatRupees = (num) =>
     new Intl.NumberFormat('en-IN', {

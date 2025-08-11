@@ -45,18 +45,23 @@ const InvoicePrintPage = () => {
             <th>Total</th>
           </tr>
         </thead>
-        <tbody>
-          {invoice.items.map((item, idx) => (
-            <tr key={idx}>
-              <td>{idx + 1}</td>
-              <td>{item.product}</td>
-              <td>{item.quantity}</td>
-              <td>{formatRupees(item.unitPrice)}</td>
-              <td>{formatRupees(item.amount * 0.18)}</td>
-              <td>{formatRupees(item.amount + item.amount * 0.18)}</td>
-            </tr>
-          ))}
-        </tbody>
+        {/* <tbody>
+  {Array.isArray(invoice.items) ? (
+    invoice.items.map((item, idx) => (
+      <tr key={idx}>
+        <td>{idx + 1}</td>
+        <td>{item.product}</td>
+        <td>{item.quantity}</td>
+        <td>{formatRupees(item.unitPrice)}</td>
+        <td>{formatRupees(item.amount * 0.18)}</td>
+        <td>{formatRupees(item.amount + item.amount * 0.18)}</td>
+      </tr>
+    ))
+  ) : (
+    <tr><td colSpan="6">No items available</td></tr>
+  )}
+</tbody> */}
+
       </table>
 
       <h4 style={{ textAlign: 'right', marginTop: '20px' }}>
