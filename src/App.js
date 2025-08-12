@@ -416,7 +416,7 @@ const getUnpaidInvoices = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
-    window.location.href = '/login';
+    window.location.href = '/mycode/#/login';
   };
   const renderPrintForm = () => {
     if (!selectedInvoice) return null;
