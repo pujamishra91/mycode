@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 //import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App';
-import Login from './Pages/Login';
-import Signup from './Pages/Signup';
+import Login from './Login';
+import Signup from './Signup';
 import ProtectedRoute from './ProtectedRoute';
 import InvoicePrintPage from './InvoicePrintPage'; // ✅ Import this new page
 
