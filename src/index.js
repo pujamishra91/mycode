@@ -23,7 +23,7 @@ root.render(
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/print" element={<InvoicePrintPage />} /> {/* ✅ Add this route */}
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/mycode" />} />
     </Routes>
   </BrowserRouter>
 );
